@@ -19,7 +19,7 @@ public class Run {
       
       User hong = context.getBean("hong", User.class);
       System.out.println(hong);
-      
+     
       User lee =  context.getBean("lee", User.class);
       System.out.println(lee);
 

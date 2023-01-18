@@ -1,4 +1,4 @@
-package bean.cheatSheet;
+package bean.cheatsheet;
 
 public class Score {
 	
