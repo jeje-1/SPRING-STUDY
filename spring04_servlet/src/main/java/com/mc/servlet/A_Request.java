@@ -36,10 +36,14 @@ public class A_Request extends HttpServlet {
       // TODO Auto-generated method stub
       System.out.println("doGet 메서드 호출");
       
+      response.setHeader("content-type", "text/html; charshet-utf-8");
+      
       String name = request.getParameter("name");
       int age = Integer.parseInt(request.getParameter("age"));
       System.out.println(name + " : " + age);
-      
+	   ///////////////////////////////////////////////////////
+	      
+	      // session 객체로부터 user정보를 가져오는 코드
      PrintWriter pw = response.getWriter();
      HttpSession session = request.getSession();
      
@@ -64,6 +68,16 @@ public class A_Request extends HttpServlet {
       System.out.println(name + " : " + age);
       System.out.println(request.getContentType());
       
+      
+      ///////////////////////////////////////////////////////
+      
+      // session 객체로부터 user정보를 가져오는 코드
+      PrintWriter pw = response.getWriter();
+      HttpSession session = request.getSession();
+      
+      if(session.getAttribute("user") != null) {
+     	 pw.println("<h3>user : " + session.getAttribute("user") +"</h3>");
+      }
       
       /////////////////////////////////////////////////////
       

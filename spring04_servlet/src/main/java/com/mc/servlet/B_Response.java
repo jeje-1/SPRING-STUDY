@@ -8,6 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Servlet implementation class B_Response
@@ -35,6 +36,16 @@ public class B_Response extends HttpServlet {
       pw.println("<h1>getWriter : response body에 문자 데이터 작성 </h1>");
       pw.println("<h1>getOutputStream : response body에 바이너리 데이터 작성 </h1>");
       pw.println("<h1>sendRedirect : 응답상태코드 302 반환 </h1>");
+      
+ ///////////////////////////////////////////////////////
+      
+      // session 객체로부터 user정보를 가져오는 코드
+      HttpSession session = request.getSession();
+      
+      if(session.getAttribute("user") != null) {
+     	 pw.println("<h3>user : " + session.getAttribute("user") +"</h3>");
+      }
+      
    
    }
 
