@@ -46,7 +46,7 @@ public class ViewResolver implements Filter {
 	 * @see Filter#init(FilterConfig)
 	 */
 	public void init(FilterConfig fConfig) throws ServletException {
-		// TODO Auto-generated method stub
+		System.out.println("viewresolver 시작");
 	}
 
 }
