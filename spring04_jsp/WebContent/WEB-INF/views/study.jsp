@@ -46,7 +46,7 @@
 	String name = "mc";
 	
 	public void printName(){
-	//System.out.println(name); 
+	System.out.println(name); 
 	}
 %>
 

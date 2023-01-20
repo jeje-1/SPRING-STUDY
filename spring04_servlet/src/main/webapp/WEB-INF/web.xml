@@ -41,7 +41,7 @@
   
    <filter>
 	  <filter-name>viewResolver</filter-name>
-	  <filter-class>com.mc.servlet.filter.viewResolver</filter-class>
+	  <filter-class>com.mc.servlet.filter.ViewResolver</filter-class>
   </filter>
   <filter-mapping>
   	<filter-name>viewResolver</filter-name>
