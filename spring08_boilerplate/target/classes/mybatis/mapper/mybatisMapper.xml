@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<!-- namespace : 생성될 프록시 객체의 타입 -->
+<mapper namespace="com.mc.mvc.mybatis.repository.MybatisRepository">
+
+<!-- 
+	#{} : preparedStatement의 쿼리템플릿을 완성시킨 뒤 파라미터값을 전달받아 쿼리를 완성한다.
+		문자열 이스케이프처리가 되기 떄문에, sqlInjection 공격으로 부터 안전하다.
+	
+	${} : preparedStatement의 쿼리 템플릿이 생성되는 시점에 사용자로부터 전달받은 파라미터값을 사용해
+		쿼리템플릿을 완성시킨다. 잘 사용하면 만능 if문처럼 유용한 쿼리를 작성할 수 있지만
+		잘 못 자용하면 sqlInjection 공격으로 부터 보호받지 못한다. 
+ -->
+	
+	<select id="dynamicIf" resultType="Book">
+		select * from book 
+		where 
+		<if test="filter == 'title'">
+			title like concat('%',#{keyword},'%')
+		</if>
+		<if test="filter == 'author'">
+			author like concat('%',#{keyword},'%')
+		</if>
+	</select>
+	
+	<select id="dynamicChoose" resultType="Book">
+		select * from book 
+		where 
+		<choose>
+			<when test="filter == 'title'">
+				title like concat('%',#{keyword},'%')
+			</when>
+			<otherwise>
+				author like concat('%',#{keyword},'%')
+			</otherwise>
+		</choose>
+	</select>
+	
+	<update id="dynamicSet">
+		update member
+	<set>
+		<if test="password != null">
+			password = #{password}
+		</if>
+		<if test="email != null">
+			,email = #{email}
+		</if>
+		<if test="tell != null">
+			,tell = #{tell}
+		</if>
+	</set>
+		where user_id = #{userId}
+	</update>
+	
+	<insert id="dynamicForEach">
+	
+		insert into ${table}
+		<foreach collection="data" index="key" item="val" open="(" separator="," close=")">
+			${key}
+		</foreach>
+		values
+		<foreach collection="data" index="key" item="val" open="(" separator="," close=")">
+			#{val}
+		</foreach>
+	</insert>
+	
+	<select id="dynamicWhere" resultType="Book">
+		select * from book
+		where
+		<if test="rentable">
+			book_amt > 0
+		</if>
+		
+		<foreach collection="filters" item="filter">
+			<if test="filter == 'title'">
+				or title like concat('%',#{keyword},'%')
+			</if>
+			<if test="filter == 'author'">
+				or author like concat('%',#{keyword},'%')
+			</if>
+		</foreach>
+	
+	</select>
+	
+	<resultMap type="map" id="rentData">
+	
+		<!-- 
+			column : resultSet의 컬럼
+			JavaType : 해당 컬럼의 값을 받을 자바의 타입
+			property : 해당 컬럼의 값에 접근하기 위한 map의 key값
+		 -->
+		 <result column="rm_idx" javaType="string" property="rmIdx"/>
+		 <result column="rb_idx" javaType="string" property="rbIdx"/>
+		 <result column="user_id" javaType="string" property="userId"/>
+		 <result column="return_date" javaType="LocalDateTime" property="returnDate"/>
+		 <result column="title" javaType="string" property="title" />
+		 <result column="isbn" javaType="string" property="isbn" />
+		 <result column="rent_book_cnt" javaType="int" property="rentBookCnt"/>
+		 
+	</resultMap>
+	
+	<select id="resultMap" resultMap="rentData">
+		select
+			rm_idx, rb_idx,user_id,return_date, rm.title
+			,isbn, rent_book_cnt
+		from rent_matser rm
+		join rent_book using(rm_idx)
+		join book using(bk_idx)
+		
+		where rb_idx = #{rbIdx}
+	
+	</select>
+	
+</mapper>

@@ -142,6 +142,7 @@ red,blue,yellow, pink,green
 	var : 잘라진 문자열을 받을 레퍼런스
 	items : 자를 문자열
 	delims : 구분자
+	
 </pre>
 <ul>
 	<c:forTokens items="java html css js mysql servlet jsp" delims=" " var="lang">
