@@ -8,4 +8,6 @@ public interface MemberService {
 
 	void insertNewMember(Member member);
 
+	void authenticateEmail(Member member, String authToken);
+
 }

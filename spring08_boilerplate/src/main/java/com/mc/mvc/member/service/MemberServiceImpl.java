@@ -1,9 +1,21 @@
 package com.mc.mvc.member.service;
 
+import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
+import com.mc.mvc.common.code.Code;
+import com.mc.mvc.common.mail.MailSender;
 import com.mc.mvc.member.dto.Member;
 import com.mc.mvc.member.repository.MemberRepository;
 
@@ -13,6 +25,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService{
+	
+	private final MailSender sender;
+	private final RestTemplate restTemplate;
 	
 	private final MemberRepository memberRepository;
 	private final PasswordEncoder passwordEncoder;
@@ -27,6 +42,29 @@ public class MemberServiceImpl implements MemberService{
 		member.setPassword(passwordEncoder.encode(member.getPassword()));
 		memberRepository.insertMember(member);
 	}
+
+	@Override
+	public void authenticateEmail(Member member, String authToken) {
+		
+		Map<String, Object> body = new LinkedHashMap<String, Object>();
+		body.put("userId", member.getUserId());
+		body.put("authToken", authToken);
+		body.put("mailTemplate", "signup-email-auth");
+	 
+		RequestEntity<Map<String,Object>> request = 
+			RequestEntity
+			.post(Code.DOMAIN + "/mail")
+			.contentType(MediaType.APPLICATION_JSON)
+			.body(body);
+
+		ResponseEntity<String> response = restTemplate.exchange(request, String.class);
+		String html = response.getBody();
+		
+		System.out.println(html);
+		sender.send(member.getEmail(), "회원가입을 환영합니다. 링크를 클릭해 회원가입을 완료하세요.", html);
+	}
+		
+}
 	
 	
 	
@@ -35,4 +73,3 @@ public class MemberServiceImpl implements MemberService{
 	
 	
 
-}
