@@ -12,6 +12,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.queryParam;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -52,11 +53,22 @@ public class MemberControllerTest {
 		.andDo(print());
 	}
 	
+	@Test
+	public void testCheckId() throws Exception {
+		mockMvc.perform(get("/member/checkId")
+				.param("userId", "admin"))
+				.andDo(print());
+	}
 	
-	
-	
-	
-	
+	@Test
+	public void testSignUpFormValidator() throws Exception {
+		mockMvc.perform(post("/member/mailauth")
+				.param("userId", "testUserWithEmail2")
+				.param("password", "1234")
+				.param("email", "econoone@gmail.com")
+				.param("tell", "010-0119-0112"))
+		.andDo(print());
+	}
 	
 	
 

@@ -16,7 +16,9 @@ public class IndexController {
 	// return "index"; 가 생략된 것과 같다.
 	// ViewResolver에 의해 /WEB-INF/views/index.jsp로 forward가 된다.
 	@GetMapping("index")
-	public void index(){};
+	public void index(){
+	
+	};
 	
 	
 	
