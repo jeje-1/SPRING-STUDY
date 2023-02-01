@@ -1,4 +1,4 @@
-package com.mc.mvc.member.dto.validator.form;
+package com.mc.mvc.member.validator;
 
 import java.util.regex.Pattern;
 
@@ -10,6 +10,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import com.mc.mvc.member.repository.MemberRepository;
+import com.mc.mvc.member.validator.form.SignUpForm;
 
 import lombok.RequiredArgsConstructor;
 

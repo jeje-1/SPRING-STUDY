@@ -47,6 +47,14 @@
 		    <type>pom</type>
 		    <scope>import</scope>
 		</dependency>
+		
+		
+		<!-- commonsMultipart Resolver를 사용하기 위한 디펜던시 -->
+		<dependency>
+		    <groupId>commons-fileupload</groupId>
+		    <artifactId>commons-fileupload</artifactId>
+		    <version>1.4</version>
+		</dependency>
 				
 		<!-- AspectJ -->
 		<dependency>

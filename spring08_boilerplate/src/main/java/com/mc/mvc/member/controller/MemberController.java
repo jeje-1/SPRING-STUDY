@@ -3,6 +3,8 @@ package com.mc.mvc.member.controller;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -12,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,14 +22,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.CookieGenerator;
 
 import com.mc.mvc.common.code.ErrorCode;
 import com.mc.mvc.common.exception.HandlerableException;
 import com.mc.mvc.common.validator.ValidatorResult;
 import com.mc.mvc.member.dto.Member;
-import com.mc.mvc.member.dto.validator.form.SignUpForm;
-import com.mc.mvc.member.dto.validator.form.SignUpFormValidator;
 import com.mc.mvc.member.service.MemberService;
+import com.mc.mvc.member.validator.SignUpFormValidator;
+import com.mc.mvc.member.validator.form.SignUpForm;
 
 import lombok.RequiredArgsConstructor;
 
@@ -60,33 +65,36 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
 	
 	private final MemberService memberService;
-	private final SignUpFormValidator SignUpFormValidator;
+	private final SignUpFormValidator signUpFormValidator;
 	
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	@InitBinder
+	// ModelAttribute 가 동작하는 시점에 Data Binder가 수행
+	// Controller메서드에 SignUpForm타입의 매개변수가 있을 경우
+	// Validator 가 실행된다.
+	@InitBinder(value="signUpForm")
 	protected void initBinder(WebDataBinder binder) {
-		// Controller메서드에 SignUpForm타입의 매개변수가 있을 경우
-		// Validator 가 실행된다.
-		binder.addValidators(SignUpFormValidator);
+		binder.addValidators(signUpFormValidator);
 	}
 	
 	@GetMapping("/signup")
 	public void signup() {};
 	
-	@PostMapping("/mailauth")
-	public String mailauth(
+	@PostMapping("/signup")
+	public String authenticateEmail(
 			@Validated SignUpForm form
 			, Errors error // Validator로 사용한 form 객체 바로 뒤에 errors 객체를 선언
 			, Model model
 			, HttpSession session) {
 		
 		ValidatorResult vr = new ValidatorResult();
-		vr.addErrors(error);
+		model.addAttribute("error", vr.getErrors());
 		
-		//Validarot	를 통ㅇ과하지 못했으면
+		
+		//Validator	를 통과하지 못했으면
 		if(error.hasErrors()) {
-			model.addAttribute("error",vr);
+			vr.addErrors(error);
+			model.addAttribute("errors", vr.getErrors());
 			return "/member/signup";
 		}
 		
@@ -125,7 +133,6 @@ public class MemberController {
 		// 세션에 저장된 저장된 토큰을 삭제
 		session.removeAttribute("authToken");
 		
-		
 		return "redirect:/index";
 	}
 	
@@ -137,11 +144,44 @@ public class MemberController {
 		return Map.of("exist" , memberService.existUser(userId));
 	}
 	
+	@GetMapping("/login")
+	public void login() {
+		
+	}
 	
+	// RedirectAttributes : RedirectAttributes에 저장한 데이터를 redirect 시에 쿼리스트링으로 변환해서 응답
+	@PostMapping("/login")
+	public String loginImpl(Member member, HttpSession session, RedirectAttributes redirectAttr) {
+		
+		Member auth = memberService.authenticateUser(member);
+		
+		if(auth == null) {
+			redirectAttr.addFlashAttribute("msg","아이디나 비밀번호가 틀렸습니다.");
+			return "redirect:/member/login";
+		}
+		
+		session.setAttribute("auth", auth);
+		return "redirect:/member/login";
+	}
 	
+	@GetMapping("/mypage")
+	public String mypage(@SessionAttribute(name="auth") Member auth,
+						@CookieValue(name="JSESSIONID") String sessionId,
+						HttpServletResponse response) {
+		
+		logger.debug("JSESSIONID 값 : " + sessionId);
+		CookieGenerator cg = new CookieGenerator();
+		cg.setCookieName("test_cookie");
+		cg.addCookie(response, "testCookie_with_CookieGenerator");
+		return "member/mypage";
+	}
 	
-	
-	
+	@GetMapping("logout")
+	public String logout(HttpSession session) {
+		session.removeAttribute("auth");
+		return "redirect:/index";
+		
+	}
 	
 
 }
