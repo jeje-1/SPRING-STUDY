@@ -49,15 +49,18 @@ public class BoardControllerTest {
       member.setUserId("logintest");
       
       MockMultipartFile file1 = new MockMultipartFile("files", "ofn.txt","text/plain","파일업로드테스트1".getBytes());
-      MockMultipartFile file2 = new MockMultipartFile("files", "ofn.txt","text/plain","파일업로드테스트1".getBytes());
+      MockMultipartFile file2 = new MockMultipartFile("files", "ofn.txt","text/plain","파일업로드테스트2".getBytes());
       
-      mockMvc.perform(multipart("/board/upload")
-    		  .file(file1)
-    		  .file(file2)
-	          .param("title", "게시글업로드테스트")
-	          .param("content", "게시글업로드테스트 중입니다.")
-	          .sessionAttr("auth", member))
-	      .andDo(print());
+      for(int i = 0; i < 111; i++) {
+    	  mockMvc.perform(multipart("/board/upload")
+    			  .file(file1)
+    			  .file(file2)
+    			  .param("title", "게시글업로드테스트")
+    			  .param("content", "게시글업로드테스트 중입니다.")
+    			  .sessionAttr("auth", member))
+    	  .andDo(print());
+    	  
+      }
    }
    
   
